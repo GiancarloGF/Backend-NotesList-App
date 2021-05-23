@@ -148,3 +148,4 @@ let notes = [
 
 
 //git push heroku main>>Para guardar en el servidor de heroku cada vez que queremos desplegar el ultimo commit a heroku
+//las solicitudes HTTP GET a la dirección www.serversaddress.com/index.html o www.serversaddress.com mostrarán el frontend de React. Las solicitudes GET a la dirección www.serversaddress.com/api/notes serán manejadas por el código del backend.
