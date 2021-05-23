@@ -143,3 +143,6 @@ let notes = [
     app.listen(PORT,()=>{
           console.log(`Server running on port ${PORT}`);
     })
+
+
+//git push heroku main>>Para guardar en el servidor de heroku cada vez que queremos desplegar el ultimo commit a heroku
