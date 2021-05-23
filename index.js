@@ -6,7 +6,9 @@ const cors= require('cors');
 app.use(cors());
 
 /*MIDDLEWARES---------------------------------------------------------------- */
+app.use(express.static('build'));//Para hacer que express muestre contenido estático.
 app.use(express.json());//El json-parser funciona para que tome los datos JSON de una solicitud, los transforme en un objeto JavaScript y luego los adjunte a la propiedad body del objeto request antes de llamar al controlador de ruta.
+
 
 const requestLogger = (request, response, next) => {
       console.log('Method:', request.method)
@@ -55,9 +57,9 @@ let notes = [
 /*RUTAS---------------------------------------------------------------- */
 
 
-    app.get('/', (request, response) => {
-      response.send('<h1>Hello World!</h1>')//Dado que el parametro es un string, express establece automáticamente el valor del header Content-Type en text/html. El código de estado de la respuesta predeterminado es 200.
-    })
+//     app.get('/', (request, response) => {
+//       response.send('<h1>Hello World!</h1>')//Dado que el parametro es un string, express establece automáticamente el valor del header Content-Type en text/html. El código de estado de la respuesta predeterminado es 200.
+//     })
 
     app.get('/info', (request, response) => {
       
