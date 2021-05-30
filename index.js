@@ -1,11 +1,20 @@
+
+require('dotenv').config(); //Es importante que dotenv se importe antes de importar el modelo note. Esto asegura que las variables de entorno del archivo .env estén disponibles globalmente antes de que se importe el código de los otros módulos.
+
+const mongoose = require('mongoose');
+
 const express=require('express');
 const morgan = require('morgan');//Para logear en la consola informacion del request.
 const app= express();
 const cors= require('cors');
 
-app.use(cors());
+const Note=require('./models/note');
+/*MONGOOSE---------------------------------------------------------------- */
+
+
 
 /*MIDDLEWARES---------------------------------------------------------------- */
+app.use(cors());
 app.use(express.static('build'));//Para hacer que express muestre contenido estático.
 app.use(express.json());//El json-parser funciona para que tome los datos JSON de una solicitud, los transforme en un objeto JavaScript y luego los adjunte a la propiedad body del objeto request antes de llamar al controlador de ruta.
 
@@ -33,14 +42,14 @@ app.use(morgan(function (tokens, req, res) {
 
 /*BASE DE DATOS FICTICIO---------------------------------------------------------------- */
 
-let notes = [
+/* let notes = [
       {
         id: 1,
         content: "HTML is easy",
         date: "2019-05-30T17:30:31.098Z",
         important: true
       },
-      {
+      { 
         id: 2,
         content: "Browser can execute only Javascript",
         date: "2019-05-30T18:39:34.091Z",
@@ -52,7 +61,7 @@ let notes = [
         date: "2019-05-30T19:20:14.298Z",
         important: true
       }
-    ]
+    ] */
 
 /*RUTAS---------------------------------------------------------------- */
 
@@ -69,20 +78,24 @@ let notes = [
     
 
     app.get('/api/notes', (request, response)=>{
-          response.json(notes)
+          Note.find({}).then(notes=>{
+                response.json(notes);
+          })
     });
 
     app.get('/api/notes/:id', (request, response)=>{
 
-          const id = Number(request.params.id);
-
+         /* const id = Number(request.params.id);
           const note=notes.find(note=>note.id===id);
-
           if (note) {
                 response.json(note);
           }else{
                 response.status(404).end();
-          }
+          }*/
+
+      //     const id = Number(request.params.id);
+          Note.findById(request.params.id) 
+          .then(note => {response.json(note);});
     })
 
     app.delete('/api/notes/:id', (request, response)=>{
@@ -108,17 +121,24 @@ let notes = [
                 return response.status(400).json({error: 'falta contenido'});//Con este return se corta la ejecucion del codigo restante.
           }
 
-          const note={
+      //     const note= new{
+      //           content: body.content,
+      //           important: body.important || false,
+      //           date: new Date(),
+      //           id: generateId()
+      //     }
+      //     notes=notes.concat(note);
+      //     response.json(note);
+
+          const note = new Note({//Los objetos de nota se crean con la función de constructor Note
                 content: body.content,
                 important: body.important || false,
                 date: new Date(),
-                id: generateId()
-          }
+          })
 
-          notes=notes.concat(note);
-
-          response.json(note);
-
+          note.save().then(savedNote=>{// Los datos devueltos en la respuesta (savednote) son la versión formateada creada con el método toJSON
+                response.json(savedNote)
+          })
     });
 
     app.put('/api/notes/:id', (request, response)=>{
@@ -140,7 +160,7 @@ let notes = [
 
 /*INICIO Y ESCUCHA DEL SERVIDOR---------------------------------------------------------------- */
 
-    const PORT= process.env.PORT || 3001;
+    const PORT= process.env.PORT;
     
     app.listen(PORT,()=>{
           console.log(`Server running on port ${PORT}`);
