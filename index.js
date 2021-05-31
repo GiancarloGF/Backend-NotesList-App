@@ -1,23 +1,14 @@
-
 require('dotenv').config(); //Es importante que dotenv se importe antes de importar el modelo note. Esto asegura que las variables de entorno del archivo .env estén disponibles globalmente antes de que se importe el código de los otros módulos.
-
-const mongoose = require('mongoose');
-
 const express=require('express');
 const morgan = require('morgan');//Para logear en la consola informacion del request.
 const app= express();
 const cors= require('cors');
-
 const Note=require('./models/note');
-/*MONGOOSE---------------------------------------------------------------- */
-
-
 
 /*MIDDLEWARES---------------------------------------------------------------- */
 app.use(cors());
 app.use(express.static('build'));//Para hacer que express muestre contenido estático.
 app.use(express.json());//El json-parser funciona para que tome los datos JSON de una solicitud, los transforme en un objeto JavaScript y luego los adjunte a la propiedad body del objeto request antes de llamar al controlador de ruta.
-
 
 const requestLogger = (request, response, next) => {
       console.log('Method:', request.method)
@@ -40,43 +31,14 @@ app.use(morgan(function (tokens, req, res) {
       ].join(' ')
     }));
 
-/*BASE DE DATOS FICTICIO---------------------------------------------------------------- */
-
-/* let notes = [
-      {
-        id: 1,
-        content: "HTML is easy",
-        date: "2019-05-30T17:30:31.098Z",
-        important: true
-      },
-      { 
-        id: 2,
-        content: "Browser can execute only Javascript",
-        date: "2019-05-30T18:39:34.091Z",
-        important: false
-      },
-      {
-        id: 3,
-        content: "GET and POST are the most important methods of HTTP protocol",
-        date: "2019-05-30T19:20:14.298Z",
-        important: true
-      }
-    ] */
 
 /*RUTAS---------------------------------------------------------------- */
-
-
-//     app.get('/', (request, response) => {
-//       response.send('<h1>Hello World!</h1>')//Dado que el parametro es un string, express establece automáticamente el valor del header Content-Type en text/html. El código de estado de la respuesta predeterminado es 200.
-//     })
 
     app.get('/info', (request, response) => {
       
       response.send('<h1>Hello World!</h1>')//Dado que el parametro es un string, express establece automáticamente el valor del header Content-Type en text/html. El código de estado de la respuesta predeterminado es 200.
     })
     
-    
-
     app.get('/api/notes', (request, response)=>{
           Note.find({}).then(notes=>{
                 response.json(notes);
@@ -85,20 +47,19 @@ app.use(morgan(function (tokens, req, res) {
 
     app.get('/api/notes/:id', (request, response)=>{
 
-         /* const id = Number(request.params.id);
-          const note=notes.find(note=>note.id===id);
-          if (note) {
-                response.json(note);
-          }else{
-                response.status(404).end();
-          }*/
-
-      //     const id = Number(request.params.id);
           Note.findById(request.params.id) 
-          .then(note => {response.json(note);});
+          .then(note => {
+                if(note){
+                      response.json(note);
+                }else{//Si no se encuentra ningún objeto coincidente en la base de datos, el valor de note será null y se ejecutará el bloque else
+                      response.status(404).end();
+                }
+            })
+            .catch(error => next(error)); //Si se rechaza la promesa, por ejemplo, por un id mal mormateado, se ejecuta este codigo
+            //Si se llama a la función next con un parámetro, la ejecución continuará en el middleware del controlador de errores.
     })
 
-    app.delete('/api/notes/:id', (request, response)=>{
+    app.delete('/api/notes/:id', (request, response,next)=>{
 
           const id = Number(request.params.id);
 
@@ -120,15 +81,6 @@ app.use(morgan(function (tokens, req, res) {
           if (!body.content) {
                 return response.status(400).json({error: 'falta contenido'});//Con este return se corta la ejecucion del codigo restante.
           }
-
-      //     const note= new{
-      //           content: body.content,
-      //           important: body.important || false,
-      //           date: new Date(),
-      //           id: generateId()
-      //     }
-      //     notes=notes.concat(note);
-      //     response.json(note);
 
           const note = new Note({//Los objetos de nota se crean con la función de constructor Note
                 content: body.content,
@@ -158,6 +110,17 @@ app.use(morgan(function (tokens, req, res) {
     
     app.use(unknownEndpoint)
 
+    const errorHandler =(error, request, response, next)=>{
+      console.log(error.message);
+      if(error.name==='CastError'){//El controlador de errores comprueba si el error es una excepción CastError, en cuyo caso sabemos que el error fue causado por un ID de objeto no válido para Mongo.En todas las demás situaciones de error, el middleware pasa el error al controlador de errores Express predeterminado.
+            return response.status(400).send({error: 'id mal formateado'})
+      };
+      next(error);//Si se llama a la función next con un parámetro, la ejecución continuará en el middleware del controlador de errores.
+      }
+
+      app.use(errorHandler);
+
+
 /*INICIO Y ESCUCHA DEL SERVIDOR---------------------------------------------------------------- */
 
     const PORT= process.env.PORT;
@@ -167,5 +130,8 @@ app.use(morgan(function (tokens, req, res) {
     })
 
 
-//git push heroku main>>Para guardar en el servidor de heroku cada vez que queremos desplegar el ultimo commit a heroku
+//git push heroku main >> Para guardar en el servidor de heroku cada vez que queremos desplegar el ultimo commit a heroku
 //las solicitudes HTTP GET a la dirección www.serversaddress.com/index.html o www.serversaddress.com mostrarán el frontend de React. Las solicitudes GET a la dirección www.serversaddress.com/api/notes serán manejadas por el código del backend.
+
+/*CONTROLADORES DE ERRORES >>Dado que el controlador de endpoint desconocido responde a todas las solicitudes con 404 unknown endpoint, no se llamará a ninguna ruta o middleware después de que el middleware de endpoint desconocido haya enviado la respuesta. 
+La única excepción a esto es el controlador de errores que debe estar al final, después del controlador de endpoints desconocido. */
