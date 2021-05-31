@@ -61,11 +61,11 @@ app.use(morgan(function (tokens, req, res) {
 
     app.delete('/api/notes/:id', (request, response,next)=>{
 
-          const id = Number(request.params.id);
-
-          notes = notes.filter(note=>note.id!==id);//Nuevo array con todos los recursos menos el que hemos eliminado.
-
-          response.status(204).end();
+      Note.findByIdAndRemove(request.params.id)
+      .then(result=>{
+            response.status(204).end()
+      })
+      .catch(error=>next(error));
     })
 
     const generateId=() =>{
@@ -94,12 +94,19 @@ app.use(morgan(function (tokens, req, res) {
     });
 
     app.put('/api/notes/:id', (request, response)=>{
-          const note=request.body;
-          const id=Number(request.params.id);
-          notes=notes.filter(note=>note.id!==id);
-          notes=notes.concat(note);
-          
-          response.json(note);
+          const body=request.body;
+
+          const note={
+            content: body.content,
+            important: body.important,
+            /*No estamos editando aqui el date ya que no se esta creando uno nuevo (la fecha es del dia que se creo, no cuando se editó) */
+          }
+
+          Note.findByIdAndUpdate(request.params.id, note, {new: true})
+          .then(updatedNote=>{
+                response.json(updatedNote)
+          })
+          .catch(error=>next(error))
     });
 
 /*MIDDLEWARES DE ERROR---------------------------------------------------------------- */
@@ -135,3 +142,6 @@ app.use(morgan(function (tokens, req, res) {
 
 /*CONTROLADORES DE ERRORES >>Dado que el controlador de endpoint desconocido responde a todas las solicitudes con 404 unknown endpoint, no se llamará a ninguna ruta o middleware después de que el middleware de endpoint desconocido haya enviado la respuesta. 
 La única excepción a esto es el controlador de errores que debe estar al final, después del controlador de endpoints desconocido. */
+
+/*Hay un detalle importante con respecto al uso del método findByIdAndUpdate. De forma predeterminada, el parámetro updatedNote del controlador de eventos recibe el documento original sin las modificaciones. 
+Agregamos el parámetro opcional { new: true }, que hará que nuestro controlador de eventos sea llamado con el nuevo documento modificado en lugar del original. */
