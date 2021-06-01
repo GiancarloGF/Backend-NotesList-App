@@ -86,8 +86,13 @@ app.use(morgan(function (tokens, req, res) {
                 date: new Date(),
           })
 
-          note.save().then(savedNote=>{// Los datos devueltos en la respuesta (savednote) son la versión formateada creada con el método toJSON
-                response.json(savedNote.toJSON)
+          note.save()
+          .then(savedNote=>{
+           // console.log(savedNote) -> id como objeto.
+           //console.log(savedNote.toJSON()) -> id como string
+            return savedNote.toJSON()})// Los datos devueltos en la respuesta (savednote) son la versión formateada creada con el método toJSON
+          .then(savedAndFormattedNote=>{
+                response.json(savedAndFormattedNote)
           })
           .catch(error =>next(error))
     });
