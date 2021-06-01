@@ -45,7 +45,7 @@ app.use(morgan(function (tokens, req, res) {
           })
     });
 
-    app.get('/api/notes/:id', (request, response)=>{
+    app.get('/api/notes/:id', (request, response,next)=>{
 
           Note.findById(request.params.id) 
           .then(note => {
@@ -75,12 +75,10 @@ app.use(morgan(function (tokens, req, res) {
       return maxId + 1
     };
 
-    app.post('/api/notes', (request, response)=>{
+    app.post('/api/notes', (request, response, next)=>{
           const body= request.body;
 
-          if (!body.content) {
-                return response.status(400).json({error: 'falta contenido'});//Con este return se corta la ejecucion del codigo restante.
-          }
+          
 
           const note = new Note({//Los objetos de nota se crean con la función de constructor Note
                 content: body.content,
@@ -89,8 +87,9 @@ app.use(morgan(function (tokens, req, res) {
           })
 
           note.save().then(savedNote=>{// Los datos devueltos en la respuesta (savednote) son la versión formateada creada con el método toJSON
-                response.json(savedNote)
+                response.json(savedNote.toJSON)
           })
+          .catch(error =>next(error))
     });
 
     app.put('/api/notes/:id', (request, response)=>{
@@ -121,7 +120,9 @@ app.use(morgan(function (tokens, req, res) {
       console.log(error.message);
       if(error.name==='CastError'){//El controlador de errores comprueba si el error es una excepción CastError, en cuyo caso sabemos que el error fue causado por un ID de objeto no válido para Mongo.En todas las demás situaciones de error, el middleware pasa el error al controlador de errores Express predeterminado.
             return response.status(400).send({error: 'id mal formateado'})
-      };
+      }else if(error.name==='ValidationError'){//Para controlar errores de validacion.
+            return response.status(400).json({error: error.message})
+      }
       next(error);//Si se llama a la función next con un parámetro, la ejecución continuará en el middleware del controlador de errores.
       }
 
