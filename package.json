@@ -4,12 +4,13 @@
   "description": "Notes's server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "build:ui": "rm -rf build && cd ../lista_notas && npm run build --prod && cp -r build ../server_nodejs_notes/",
+    "start": " cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "build:ui": "cross-env rm -rf build && cd ../lista_notas && npm run build --prod && cp -r build ../server_nodejs_notes/",
     "deploy": "git push heroku master",
     "deploy:full": "npm run build:ui && git add . && git commit -m 'Last commit' && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
   },
   "author": "Giancarlo Guerra",
   "license": "ISC",
@@ -21,7 +22,12 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^7.27.0",
+    "jest": "^27.0.4",
     "nodemon": "^2.0.7"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
