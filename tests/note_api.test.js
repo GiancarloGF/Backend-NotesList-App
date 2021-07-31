@@ -34,11 +34,12 @@ test('notes are returned as json', async () => {
       await api
             .get('/api/notes')
             .expect(200)
-            // .expect('Content-Type', /application/json/)
+            .expect('Content-Type', /application\/json/)
 })
 /* Nuestra prueba realiza una solicitud HTTP GET a la URL api/notes y verifica que se responda a la solicitud con el código de estado 200. La prueba también verifica que el encabezado Content-Type se establece en application/json, lo que indica que los datos están en el formato deseado.
 supertest se encarga de que la aplicación que se está probando se inicie en el puerto que utiliza internamente cuando el servidor no esta escuchando para las conexiones.
- */
+El api.get().... es asincrono, por lo que tenemos que esperarlo a que reazice su ejecución por lo que le aplicamos el async/await
+*/
 
 test('there are two notes', async () => {
       const response = await api.get('/api/notes')
