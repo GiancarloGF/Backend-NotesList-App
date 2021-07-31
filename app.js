@@ -9,9 +9,9 @@ const logger = require('./utils/logger');
 const mongoose = require('mongoose');
 
 
-/*CONECCION CON MONGO A TRAVEZ DE MONGOOSE---------------------------------------------------------------- */
+/*CONECCION CON MONGO A TRAVEZ DE MONGOOSE-------------------------------------------------------------- */
 
-logger.info('Connecting to' , config.MONGODB_URI)
+logger.info('Connecting to...' , config.MONGODB_URI)
 
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(() => {
