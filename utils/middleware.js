@@ -15,7 +15,7 @@ const unknownEndpoint = (request, response) => {
 };
 
 const errorHandler =(error, request, response, next) => {
-      logger.log(error.message);
+      logger.error(error.message);
       if(error.name==='CastError'){//El controlador de errores comprueba si el error es una excepción CastError, en cuyo caso sabemos que el error fue causado por un ID de objeto no válido para Mongo.En todas las demás situaciones de error, el middleware pasa el error al controlador de errores Express predeterminado.
         return response.status(400).send({ error: 'id mal formateado' });
       }else if(error.name==='ValidationError'){//Para controlar errores de validacion.

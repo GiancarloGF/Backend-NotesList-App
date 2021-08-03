@@ -1,6 +1,7 @@
 
 const config =require('./utils/config'); //Valiables de entorno
-const express=require('express');
+const express=require('express'); 
+require('express-async-errors');//Nos permite omitir el try-catch en el async/await
 const app= express();
 const cors= require('cors');
 const notesRouter=require('./controllers/notes');
