@@ -5,6 +5,8 @@ require('express-async-errors');//Nos permite omitir el try-catch en el async/aw
 const app= express();
 const cors= require('cors');
 const notesRouter=require('./controllers/notes');
+const usersRouter=require('./controllers/users');
+const loginRouter=require('./controllers/login');
 const middleware=require('./utils/middleware');
 const logger = require('./utils/logger');
 const mongoose = require('mongoose');
@@ -28,7 +30,9 @@ app.use(express.static('build'));//Para hacer que express muestre contenido est√
 app.use(express.json());//El json-parser funciona para que tome los datos JSON de una solicitud, los transforme en un objeto JavaScript y luego los adjunte a la propiedad body del objeto request antes de llamar al controlador de ruta.
 
 app.use(middleware.requestLogger);
+app.use('/api/login', loginRouter);
 app.use('/api/notes', notesRouter);
+app.use('/api/users', usersRouter);
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
