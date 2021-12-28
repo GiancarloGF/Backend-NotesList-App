@@ -1,10 +1,17 @@
 const mongoose=require('mongoose');
 
 const noteSchema =new mongoose.Schema({
-      content: {
+      title:{
+            type:String,
+            required:true
+      },
+      comment: {
             type: String,
             minlength: 5,
-            required: true
+      },
+      status:{
+            type: String,
+            required: true,
       },
       date: {
             type: Date,

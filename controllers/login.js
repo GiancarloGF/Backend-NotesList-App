@@ -8,7 +8,7 @@ loginRouter.post('/', async (request, response)=>{
       const body=request.body;
 
       //Returns the user in the db.
-      const user=await User.findOne({username:body.username});
+      const user=await User.findOne({email:body.email});
 
       //Compare and verify the request password.
       const passwordCorrect=user===null                       
@@ -21,14 +21,14 @@ loginRouter.post('/', async (request, response)=>{
       }
       //If the user is authorized, a token is created.
       const userForToken={
-            username:user.username,
+            email:user.username,
             id:user._id,
       }
       //The token is given back signed digitally using an environment variable string as a secret.
       const token=jwt.sign(userForToken,process.env.SECRET)
 
       //The token is returned back with the user's username and name.
-      response.status(200).send({token, username:user.username, name:user.name})
+      response.status(200).send({token, email:user.email, name:user.name})
 })
 
 module.exports=loginRouter;

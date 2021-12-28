@@ -2,7 +2,7 @@ const mongoose=require('mongoose');
 const uniqueValidator=require('mongoose-unique-validator');//Libreria de mongoose para validar datos en el schema.
 
 const userSchema=new mongoose.Schema({
-      username: {
+      email: {
             type: 'string',
             unique: true
       },
