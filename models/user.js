@@ -1,14 +1,17 @@
-const mongoose=require('mongoose');
-const uniqueValidator=require('mongoose-unique-validator');//Libreria de mongoose para validar datos en el schema.
+const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');//Libreria de mongoose para validar datos en el schema.
 
-const userSchema=new mongoose.Schema({
+const userSchema = new mongoose.Schema({
       email: {
             type: 'string',
             unique: true
       },
-      name: String,
+      userName: {
+            type: 'string',
+            unique: true
+      },
       passwordHash: String,
-      notes:[
+      notes: [
             {
                   type: mongoose.Schema.Types.ObjectId,
                   ref: 'Note'
@@ -16,9 +19,9 @@ const userSchema=new mongoose.Schema({
       ]
 })
 
-userSchema.set('toJSON',{
+userSchema.set('toJSON', {
       transform: (document, returnedObject) => {
-            returnedObject.id=returnedObject._id.toString()
+            returnedObject.id = returnedObject._id.toString()
             delete returnedObject._id
             delete returnedObject.__v
             delete returnedObject.passwordHash
@@ -27,6 +30,6 @@ userSchema.set('toJSON',{
 
 userSchema.plugin(uniqueValidator)
 
-const User=mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema)
 
-module.exports=User;
+module.exports = User;

@@ -3,6 +3,7 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.post('/', async (request, response) => {
+
   const body = request.body
   
   const saltRounds = 10
@@ -10,7 +11,7 @@ usersRouter.post('/', async (request, response) => {
 
   const user = new User({
     email: body.email,
-    name: body.name,
+    userName: body.userName,
     passwordHash,
   })
 
