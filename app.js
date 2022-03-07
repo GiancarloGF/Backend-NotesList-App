@@ -29,7 +29,9 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology
 app.use(cors());
 app.use(express.static('build'));//Para hacer que express muestre contenido estático.
 app.use(express.json());//El json-parser funciona para que tome los datos JSON de una solicitud, los transforme en un objeto JavaScript y luego los adjunte a la propiedad body del objeto request antes de llamar al controlador de ruta.
-
+app.get('/dashboard',  (request, response)=>{
+  response.redirect('/')
+})
 app.use(middleware.requestLogger);
 app.use('/api/login', loginRouter);
 app.use('/api/notes', notesRouter);
